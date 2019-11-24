@@ -10,13 +10,13 @@ from sklearn import neural_network
 
 
 def main():
-    df = pandas.read_csv("tcd-ml-1920-group-income-train.csv", index_col='Instance')
+    df = pandas.read_csv("data/tcd-ml-1920-group-income-train.csv", index_col='Instance')
     trainingDataLength = len(df.index)
     y_train = df['Total Yearly Income [EUR]']
     y_train.to_csv("TrainingResults.csv")
     # y_train = y_train[:trainingDataLength]
     # print(trainingDataLength)
-    tdf = pandas.read_csv("tcd-ml-1920-group-income-test.csv", index_col='Instance')
+    tdf = pandas.read_csv("data/tcd-ml-1920-group-income-test.csv", index_col='Instance')
     fulldf = pandas.concat([df, tdf], sort = True)
     # fulldf.to_csv("CombinedParams.csv")
 
@@ -40,8 +40,12 @@ def main():
     fulldf['Female'] = gender_df['female'].copy()
     fulldf.drop('Gender', axis = 1, inplace = True)
 
+    fulldf["Profession"].fillna("Unknown")
     fulldf['Profession'] = replaceWithMeans(fulldf[['Profession', 'Total Yearly Income [EUR]']].copy())
+    fulldf['Country'].fillna("Unknown")
     fulldf['Country'] = replaceWithMeans(fulldf[['Country', 'Total Yearly Income [EUR]']].copy())
+    allowed_vals = ['Black', 'Blond', 'Brown', 'Red', 'Unknown']
+    fulldf.loc[~fulldf["Hair Color"].isin(allowed_vals), "Hair Color"] = "Unknown"
     fulldf['Hair Color'] = replaceWithMeans(fulldf[['Hair Color', 'Total Yearly Income [EUR]']].copy())
 
     fulldf['Satisfation with employer'].replace({'Unhappy': -1, 'Average': 0, 'Happy': 2, 'Somewhat Happy': 1}, inplace = True)
