@@ -10,13 +10,13 @@ from sklearn import neural_network
 
 
 def main():
-    df = pandas.read_csv("data/tcd-ml-1920-group-income-train.csv", index_col='Instance')
+    df = pandas.read_csv("tcd-ml-1920-group-income-train.csv", index_col='Instance')
     trainingDataLength = len(df.index)
     y_train = df['Total Yearly Income [EUR]']
     y_train.to_csv("TrainingResults.csv")
     # y_train = y_train[:trainingDataLength]
     # print(trainingDataLength)
-    tdf = pandas.read_csv("data/tcd-ml-1920-group-income-test.csv", index_col='Instance')
+    tdf = pandas.read_csv("tcd-ml-1920-group-income-test.csv", index_col='Instance')
     fulldf = pandas.concat([df, tdf], sort = True)
     # fulldf.to_csv("CombinedParams.csv")
 
@@ -30,6 +30,7 @@ def main():
     # fulldf['Work Experience in Current Job [years]'] = pandas.to_numeric(fulldf['Work Experience in Current Job [years]'], errors='coerce').fillna(fulldf['Work Experience in Current Job [years]'].mean())
     fulldf['Size of City'] = pandas.to_numeric(fulldf['Size of City'], errors='coerce').fillna(fulldf['Size of City'].mean())
     fulldf['Body Height [cm]'] = pandas.to_numeric(fulldf['Body Height [cm]'], errors='coerce').fillna(fulldf['Body Height [cm]'].mean())
+    fulldf['Wears Glasses'] = pandas.to_numeric(fulldf['Wears Glasses'], errors='coerce').fillna(0)
     print("Coerced Numeric data")
 
     # TODO Sanitized Work Experience
@@ -45,6 +46,8 @@ def main():
 
     fulldf['Satisfation with employer'].replace({'Unhappy': -1, 'Average': 0, 'Happy': 2, 'Somewhat Happy': 1}, inplace = True)
     fulldf['Satisfation with employer'] = pandas.to_numeric(fulldf['Satisfation with employer'], errors='coerce').fillna(0)
+
+    fulldf['Work Experience in Current Job [years]'] = pandas.to_numeric(fulldf['Work Experience in Current Job [years]'], errors='coerce').fillna(0)
 
     fulldf.drop('Housing Situation', axis = 1, inplace = True)
     fulldf.drop('Yearly Income in addition to Salary (e.g. Rental Income)', axis = 1, inplace = True)

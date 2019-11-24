@@ -80,8 +80,6 @@ x_train = pandas.read_csv("TrainingSet.csv", converters = {'Work Experience in C
 y_train = pandas.read_csv("TrainingResults.csv")
 x_test =  pandas.read_csv("TestSet.csv")
 
-x_train['Work Experience in Current Job [years]'] = pandas.to_numeric(x_train['Work Experience in Current Job [years]'], errors='coerce').fillna(x_train['Work Experience in Current Job [years]'].mean())
-x_test['Work Experience in Current Job [years]'] = pandas.to_numeric(x_test['Work Experience in Current Job [years]'], errors='coerce').fillna(x_test['Work Experience in Current Job [years]'].mean())
 # print(x_train.dtypes)
 # gc.collect()
 # x_data.to_csv("Sanitized.csv")
