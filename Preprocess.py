@@ -40,9 +40,9 @@ def main():
     fulldf['Female'] = gender_df['female'].copy()
     fulldf.drop('Gender', axis = 1, inplace = True)
 
-    fulldf["Profession"].fillna("Unknown")
+    fulldf["Profession"].fillna("Unknown", inplace = True)
     fulldf['Profession'] = replaceWithMeans(fulldf[['Profession', 'Total Yearly Income [EUR]']].copy())
-    fulldf['Country'].fillna("Unknown")
+    fulldf['Country'].fillna("Unknown", inplace = True)
     fulldf['Country'] = replaceWithMeans(fulldf[['Country', 'Total Yearly Income [EUR]']].copy())
     allowed_vals = ['Black', 'Blond', 'Brown', 'Red', 'Unknown']
     fulldf.loc[~fulldf["Hair Color"].isin(allowed_vals), "Hair Color"] = "Unknown"
