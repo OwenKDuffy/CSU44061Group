@@ -30,6 +30,7 @@ def main():
     # fulldf['Work Experience in Current Job [years]'] = pandas.to_numeric(fulldf['Work Experience in Current Job [years]'], errors='coerce').fillna(fulldf['Work Experience in Current Job [years]'].mean())
     fulldf['Size of City'] = pandas.to_numeric(fulldf['Size of City'], errors='coerce').fillna(fulldf['Size of City'].mean())
     fulldf['Body Height [cm]'] = pandas.to_numeric(fulldf['Body Height [cm]'], errors='coerce').fillna(fulldf['Body Height [cm]'].mean())
+    fulldf['Wears Glasses'] = pandas.to_numeric(fulldf['Wears Glasses'], errors='coerce').fillna(0)
     print("Coerced Numeric data")
 
     # TODO Sanitized Work Experience
@@ -39,12 +40,18 @@ def main():
     fulldf['Female'] = gender_df['female'].copy()
     fulldf.drop('Gender', axis = 1, inplace = True)
 
+    fulldf["Profession"].fillna("Unknown", inplace = True)
     fulldf['Profession'] = replaceWithMeans(fulldf[['Profession', 'Total Yearly Income [EUR]']].copy())
+    fulldf['Country'].fillna("Unknown", inplace = True)
     fulldf['Country'] = replaceWithMeans(fulldf[['Country', 'Total Yearly Income [EUR]']].copy())
+    allowed_vals = ['Black', 'Blond', 'Brown', 'Red', 'Unknown']
+    fulldf.loc[~fulldf["Hair Color"].isin(allowed_vals), "Hair Color"] = "Unknown"
     fulldf['Hair Color'] = replaceWithMeans(fulldf[['Hair Color', 'Total Yearly Income [EUR]']].copy())
 
     fulldf['Satisfation with employer'].replace({'Unhappy': -1, 'Average': 0, 'Happy': 2, 'Somewhat Happy': 1}, inplace = True)
     fulldf['Satisfation with employer'] = pandas.to_numeric(fulldf['Satisfation with employer'], errors='coerce').fillna(0)
+
+    fulldf['Work Experience in Current Job [years]'] = pandas.to_numeric(fulldf['Work Experience in Current Job [years]'], errors='coerce').fillna(0)
 
     fulldf.drop('Housing Situation', axis = 1, inplace = True)
     fulldf.drop('Yearly Income in addition to Salary (e.g. Rental Income)', axis = 1, inplace = True)
