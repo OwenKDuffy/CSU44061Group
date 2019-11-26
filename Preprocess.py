@@ -13,7 +13,12 @@ def main():
     df = pandas.read_csv("data/tcd-ml-1920-group-income-train.csv", index_col='Instance')
     trainingDataLength = len(df.index)
     y_train = df['Total Yearly Income [EUR]']
+    RentalIncome = fulldf.['Yearly Income in addition to Salary (e.g. Rental Income)']
+    RentalIncome = RentalIncome.str.split(" ", n = 1, expand = True)[0].astype(float)
+    RentalIncome.to_csv("RentalIncome.csv")
+    y_train = y_train - RentalIncome
     y_train.to_csv("TrainingResults.csv")
+    fulldf.drop('Yearly Income in addition to Salary (e.g. Rental Income)', axis = 1, inplace = True)
     # y_train = y_train[:trainingDataLength]
     # print(trainingDataLength)
     tdf = pandas.read_csv("data/tcd-ml-1920-group-income-test.csv", index_col='Instance')
@@ -39,15 +44,20 @@ def main():
     fulldf['Female'] = gender_df['female'].copy()
     fulldf.drop('Gender', axis = 1, inplace = True)
 
-    fulldf['Profession'] = replaceWithMeans(fulldf[['Profession', 'Total Yearly Income [EUR]']].copy())
-    fulldf['Country'] = replaceWithMeans(fulldf[['Country', 'Total Yearly Income [EUR]']].copy())
-    fulldf['Hair Color'] = replaceWithMeans(fulldf[['Hair Color', 'Total Yearly Income [EUR]']].copy())
+
+    fulldf["Profession"] = fulldf["Profession"].map(fulldf["Profession"][:trainingDataLength].groupby("Profession")["Total Yearly Income [EUR]"].mean())
+    fulldf["Country"] = fulldf["Country"].map(fulldf["Country"][:trainingDataLength].groupby("Country")["Total Yearly Income [EUR]"].mean())
+    fulldf["Hair Color"] = fulldf["Hair Color"].map(fulldf["Hair Color"][:trainingDataLength].groupby("Hair Color")["Total Yearly Income [EUR]"].mean())
+    # fulldf['Profession'] = replaceWithMeans(fulldf[['Profession', 'Total Yearly Income [EUR]']].copy(), trainingDataLength)
+    # fulldf['Country'] = replaceWithMeans(fulldf[['Country', 'Total Yearly Income [EUR]']].copy(), trainingDataLength)
+    # fulldf['Hair Color'] = replaceWithMeans(fulldf[['Hair Color', 'Total Yearly Income [EUR]']].copy(), trainingDataLength)
 
     fulldf['Satisfation with employer'].replace({'Unhappy': -1, 'Average': 0, 'Happy': 2, 'Somewhat Happy': 1}, inplace = True)
     fulldf['Satisfation with employer'] = pandas.to_numeric(fulldf['Satisfation with employer'], errors='coerce').fillna(0)
 
     fulldf.drop('Housing Situation', axis = 1, inplace = True)
-    fulldf.drop('Yearly Income in addition to Salary (e.g. Rental Income)', axis = 1, inplace = True)
+
+
 
     #iterate through all professions and replace them with the average for that profession
     #get all rows with profession X
@@ -82,6 +92,7 @@ def main():
     print(fulldf.head())
     print("Merged into params")
 
+
     # Normalizing is not providing enough of an improvement to justify the added run-time
     # min_max_scaler = preprocessing.MinMaxScaler()
     # scaled_values = min_max_scaler.fit_transform(params)
@@ -91,6 +102,7 @@ def main():
     # scaled_values = stan_scaler.fit_transform(params)
     # params.loc[:,:] = scaled_values
     # print("standardized")
+    fulldf.drop('Total Yearly Income [EUR]', axis = 1, inplace = True)
 
     x_train = fulldf[:trainingDataLength]
     x_train.to_csv("TrainingSet.csv")
@@ -121,7 +133,8 @@ def main():
     # results.to_csv("groupIncomePredSubmission.csv", header = "Instance, Income")
 
 
-def replaceWithMeans(cols):
+def replaceWithMeans(cols, trainingDataLength):
+    cols = cols[0, trainingDataLength]
     vals = cols.iloc[:, 0].unique()
     for x in vals:
     # x = vals[0]
