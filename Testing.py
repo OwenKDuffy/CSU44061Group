@@ -10,16 +10,14 @@ from sklearn import neural_network
 
 
 def main():
-    df = pandas.read_csv("data/tcd-ml-1920-group-income-train.csv", index_col='Instance')
-    trainingDataLength = len(df.index)
-    # y_train = df['Total Yearly Income [EUR]']
-    # y_train.to_csv("TrainingResults.csv")
-    # y_train = y_train[:trainingDataLength]
-    # print(trainingDataLength)
-    tdf = pandas.read_csv("data/tcd-ml-1920-group-income-test.csv", index_col='Instance')
-    fulldf = pandas.concat([df, tdf], sort = True)
+    x_train = pandas.read_csv("TrainingSet.csv")
+    y_train = pandas.read_csv("TrainingResults.csv")
+    x_test =  pandas.read_csv("TestSet.csv")
+    RentalIncome = pandas.read_csv("RentalIncome.csv")
+    # fulldf = pandas.concat([df, tdf], sort = True)
     # fulldf.to_csv("CombinedParams.csv")
-
+    print(x_train.shape)
+    print(y_train.shape)
     gc.collect()
     #clear some memory used for df and tdf as they're no longer needed
     print("Read data")

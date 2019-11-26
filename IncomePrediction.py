@@ -19,9 +19,11 @@ def is_number(s):
 x_train = pandas.read_csv("TrainingSet.csv", converters = {'Work Experience in Current Job [years]' : is_number})
 y_train = pandas.read_csv("TrainingResults.csv")
 x_test =  pandas.read_csv("TestSet.csv")
+trainingDataLength = len(x_train.index)
 RentalIncome = pandas.read_csv("RentalIncome.csv")
-x_train['Work Experience in Current Job [years]'] = pandas.to_numeric(x_train['Work Experience in Current Job [years]'], errors='coerce').fillna(x_train['Work Experience in Current Job [years]'].mean())
-x_test['Work Experience in Current Job [years]'] = pandas.to_numeric(x_test['Work Experience in Current Job [years]'], errors='coerce').fillna(x_test['Work Experience in Current Job [years]'].mean())
+RentalIncome = RentalIncome[trainingDataLength:]
+# x_train['Work Experience in Current Job [years]'] = pandas.to_numeric(x_train['Work Experience in Current Job [years]'], errors='coerce').fillna(x_train['Work Experience in Current Job [years]'].mean())
+# x_test['Work Experience in Current Job [years]'] = pandas.to_numeric(x_test['Work Experience in Current Job [years]'], errors='coerce').fillna(x_test['Work Experience in Current Job [years]'].mean())
 # print(x_train.dtypes)
 # gc.collect()
 # x_data.to_csv("Sanitized.csv")
@@ -36,12 +38,16 @@ regr = neural_network.MLPRegressor()
 regr.fit(x_train, y_train)
 print("Trained models")
 # Make predictions using the testing set
-x_test['Income'] = regr.predict(x_test)
+y_predict = regr.predict(x_test)
 print("Made predictions")
 # y_test = tdf['Income']
 # results = pd.DataFrame()
-results = x_test['Income'].copy() + RentalIncome
+results = y_predict + RentalIncome
+
+submission = pandas.read_csv('data/tcd-ml-1920-group-income-submission.csv')
+
+submission['Total Yearly Income [EUR]'] = results
 # results.columns = ['Income']
 
 # print(results)
-results.to_csv("groupIncomePredSubmission.csv", header = "Instance, Income")
+submission.to_csv("groupIncomePredSubmission.csv", index=False)

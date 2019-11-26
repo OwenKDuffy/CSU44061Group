@@ -20,9 +20,9 @@ def main():
     # fulldf.to_csv("CombinedParams.csv")
     RentalIncome = fulldf['Yearly Income in addition to Salary (e.g. Rental Income)']
     RentalIncome = RentalIncome.str.split(" ", n = 1, expand = True)[0].astype(float)
-    RentalIncome.to_csv("RentalIncome.csv")
-    y_train = y_train - RentalIncome
-    y_train.to_csv("TrainingResults.csv")
+    RentalIncome.to_csv("RentalIncome.csv", header = True)
+    y_train = y_train - RentalIncome[:trainingDataLength ]
+    y_train.to_csv("TrainingResults.csv", header = True)
     fulldf.drop('Yearly Income in addition to Salary (e.g. Rental Income)', axis = 1, inplace = True)
 
     gc.collect()
@@ -32,7 +32,8 @@ def main():
     # fulldf['Housing Situation'] = pandas.to_numeric(fulldf['Housing Situation'], errors='coerce').fillna(0)
     fulldf['Crime Level in the City of Employement'] = pandas.to_numeric(fulldf['Crime Level in the City of Employement'], errors='coerce').fillna(fulldf['Crime Level in the City of Employement'].mean())
     fulldf['Age'] = pandas.to_numeric(fulldf['Age'], errors='coerce').fillna(fulldf['Age'].mean())
-    # fulldf['Work Experience in Current Job [years]'] = pandas.to_numeric(fulldf['Work Experience in Current Job [years]'], errors='coerce').fillna(fulldf['Work Experience in Current Job [years]'].mean())
+    fulldf['Work Experience in Current Job [years]'] = pandas.to_numeric(fulldf['Work Experience in Current Job [years]'], errors='coerce')
+    fulldf['Work Experience in Current Job [years]'].fillna(fulldf['Work Experience in Current Job [years]'].mean(), inplace = True)
     fulldf['Size of City'] = pandas.to_numeric(fulldf['Size of City'], errors='coerce').fillna(fulldf['Size of City'].mean())
     fulldf['Body Height [cm]'] = pandas.to_numeric(fulldf['Body Height [cm]'], errors='coerce').fillna(fulldf['Body Height [cm]'].mean())
     print("Coerced Numeric data")
