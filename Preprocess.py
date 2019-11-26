@@ -13,17 +13,17 @@ def main():
     df = pandas.read_csv("data/tcd-ml-1920-group-income-train.csv", index_col='Instance')
     trainingDataLength = len(df.index)
     y_train = df['Total Yearly Income [EUR]']
-    RentalIncome = fulldf.['Yearly Income in addition to Salary (e.g. Rental Income)']
-    RentalIncome = RentalIncome.str.split(" ", n = 1, expand = True)[0].astype(float)
-    RentalIncome.to_csv("RentalIncome.csv")
-    y_train = y_train - RentalIncome
-    y_train.to_csv("TrainingResults.csv")
-    fulldf.drop('Yearly Income in addition to Salary (e.g. Rental Income)', axis = 1, inplace = True)
     # y_train = y_train[:trainingDataLength]
     # print(trainingDataLength)
     tdf = pandas.read_csv("data/tcd-ml-1920-group-income-test.csv", index_col='Instance')
     fulldf = pandas.concat([df, tdf], sort = True)
     # fulldf.to_csv("CombinedParams.csv")
+    RentalIncome = fulldf['Yearly Income in addition to Salary (e.g. Rental Income)']
+    RentalIncome = RentalIncome.str.split(" ", n = 1, expand = True)[0].astype(float)
+    RentalIncome.to_csv("RentalIncome.csv")
+    y_train = y_train - RentalIncome
+    y_train.to_csv("TrainingResults.csv")
+    fulldf.drop('Yearly Income in addition to Salary (e.g. Rental Income)', axis = 1, inplace = True)
 
     gc.collect()
     #clear some memory used for df and tdf as they're no longer needed
@@ -45,9 +45,12 @@ def main():
     fulldf.drop('Gender', axis = 1, inplace = True)
 
 
-    fulldf["Profession"] = fulldf["Profession"].map(fulldf["Profession"][:trainingDataLength].groupby("Profession")["Total Yearly Income [EUR]"].mean())
-    fulldf["Country"] = fulldf["Country"].map(fulldf["Country"][:trainingDataLength].groupby("Country")["Total Yearly Income [EUR]"].mean())
-    fulldf["Hair Color"] = fulldf["Hair Color"].map(fulldf["Hair Color"][:trainingDataLength].groupby("Hair Color")["Total Yearly Income [EUR]"].mean())
+    fulldf['Profession'] = fulldf['Profession'].map(fulldf[:trainingDataLength].groupby('Profession')['Total Yearly Income [EUR]'].mean())
+    fulldf["Country"] = fulldf["Country"].map(fulldf[:trainingDataLength].groupby("Country")["Total Yearly Income [EUR]"].mean())
+    fulldf["Hair Color"] = fulldf["Hair Color"].map(fulldf[:trainingDataLength].groupby("Hair Color")["Total Yearly Income [EUR]"].mean())
+    fulldf['Profession'] = fulldf['Profession'].fillna(fulldf['Profession'].mean())
+    fulldf['Country'] = fulldf['Country'].fillna(fulldf['Country'].mean())
+    fulldf['Hair Color'] = fulldf['Hair Color'].fillna(fulldf['Hair Color'].mean())
     # fulldf['Profession'] = replaceWithMeans(fulldf[['Profession', 'Total Yearly Income [EUR]']].copy(), trainingDataLength)
     # fulldf['Country'] = replaceWithMeans(fulldf[['Country', 'Total Yearly Income [EUR]']].copy(), trainingDataLength)
     # fulldf['Hair Color'] = replaceWithMeans(fulldf[['Hair Color', 'Total Yearly Income [EUR]']].copy(), trainingDataLength)
